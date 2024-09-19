@@ -321,8 +321,13 @@ rolesRunPlaybook() {
     local limit=$5
     local LOGFILE="${test_playbook%.*}"-ANSIBLE-"$ANSIBLE_VER"
     local result=FAIL
-    local cmd log_msg
-    cmd="ansible-playbook -i $inventory $skip_tags $limit $tests_path$test_playbook -vv"
+    local base_cmd cmd envs log_msg
+    envs=""
+    if [ "${GET_PYTHON_MODULES:-}" = true ]; then
+        envs="$envs ANSIBLE_DEBUG=true"
+    fi
+    base_cmd="ansible-playbook -i $inventory $skip_tags $limit $tests_path$test_playbook -vv"
+    cmd="$envs $base_cmd"
     log_msg="Test $test_playbook with ANSIBLE-$ANSIBLE_VER on ${limit/--limit /}"
     # If LSR_TFT_DEBUG is true, print output to terminal
     if [ "$LSR_TFT_DEBUG" == true ] || [ "$LSR_TFT_DEBUG" == True ]; then
@@ -334,6 +339,12 @@ rolesRunPlaybook() {
     mv "$LOGFILE" "$logfile_name"
     LOGFILE=$logfile_name
     rolesUploadLogs "$LOGFILE"
+    if [ "${GET_PYTHON_MODULES:-}" = true ]; then
+        cmd="ansible-playbook -i $inventory $skip_tags $limit get_python_modules.yml -vv"
+        local packages="$LOGFILE.packages"
+        $cmd -e packages_file=$packages -e logfile="$LOGFILE"
+        rolesUploadLogs "$packages"
+    fi
 }
 
 rolesRunPlaybooksParallel() {
@@ -452,6 +463,19 @@ luns/ create /backstores/fileio/disk${i}"
 
     rlRun "rm -rf ${disk_provisioner_dir}"
     rlRun "rm -rf ${role_path}"
+}
+
+# prepare test playbooks for gathering information about python
+# module usage
+rolesSetupGetPythonModules() {
+    local tests_dir test_pb
+    tests_dir="$1"; shift
+    for test_pb in "$@"; do
+        cp "$tests_dir$test_pb" "$tests_dir$test_pb.orig"
+        sed -e '/^  hosts:/a\
+  environment:\
+    PYTHONVERBOSE: "1"' -i "$tests_dir$test_pb"
+    done
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

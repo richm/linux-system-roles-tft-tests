@@ -164,7 +164,7 @@ jobs:
       - name: Checkout the ${{ matrix.test_role }} repo
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.repository_owner }}/${{ matrix.test_role }}
+          repository: linux-system-roles/${{ matrix.test_role }}
           ref: main
           path: ${{ matrix.test_role }}
 

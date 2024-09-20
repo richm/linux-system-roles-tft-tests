@@ -19,11 +19,10 @@ jobs:
     # Let's schedule tests only on user request. NOT automatically.
     # Only repository owner or member can schedule tests
     if: |
-      (github.event.issue.pull_request
+      github.event.issue.pull_request
       && contains(github.event.comment.body, '[get_python_modules]')
       && (contains(fromJson('["OWNER", "MEMBER", "COLLABORATOR", "CONTRIBUTOR"]'), github.event.comment.author_association)
-      || contains('systemroller', github.event.comment.user.login)))
-      || github.event_name == 'workflow_dispatch'
+      || contains('systemroller', github.event.comment.user.login))
     runs-on: ubuntu-latest
     outputs:
       head_sha: ${{ steps.head_sha.outputs.head_sha }}

@@ -10,16 +10,6 @@ permissions:
   # This is required for the ability to create/update the Pull request status
   statuses: write
 jobs:
-  test_this:
-    name: Test using workflow_dispatch
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dump github context
-        run:   echo "$GITHUB_CONTEXT"
-        shell: bash
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-
   prepare_run_vars:
     name: Get head sha of the tft-tests PR
     concurrency:
@@ -303,7 +293,8 @@ jobs:
             TEST_LOCAL_CHANGES=false;\
             LINUXSYSTEMROLES_USER=${{ vars.LINUXSYSTEMROLES_USER }};\
             ARTIFACTS_URL=${{ needs.prepare_run_vars.outputs.ARTIFACTS_URL }};\
-            GET_PYTHON_MODULES=${{ contains(github.event.comment.body, 'GET_PYTHON_MODULES') }}"
+            GET_PYTHON_MODULES=${{ contains(github.event.comment.body, '[get_python_modules]') ||
+              github.event_name == 'workflow_dispatch' }}"
           # Note that LINUXSYSTEMROLES_SSH_KEY must be single-line, TF doesn't read multi-line variables fine.
           secrets: "LINUXSYSTEMROLES_DOMAIN=${{ secrets.LINUXSYSTEMROLES_DOMAIN }};\
             LINUXSYSTEMROLES_SSH_KEY=${{ secrets.LINUXSYSTEMROLES_SSH_KEY }}"

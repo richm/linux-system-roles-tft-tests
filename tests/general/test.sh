@@ -91,6 +91,7 @@ rlJournalStart
         rlRun "cat $inventory"
         tests_path="$collection_path"/ansible_collections/fedora/linux_system_roles/tests/"$REPO_NAME"/
         if [ "${GET_PYTHON_MODULES:-}" = true ]; then
+            # shellcheck disable=SC2086
             rolesSetupGetPythonModules "$tests_path" $test_playbooks
         fi
     rlPhaseEnd

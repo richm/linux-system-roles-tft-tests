@@ -173,7 +173,7 @@ jobs:
         run: |
           provision_fmf=${{ matrix.test_role }}/tests/provision.fmf
           if [ -f "$provision_fmf" ]; then
-            memory=$(grep -rPo '    m: \K(.*)' "$provision_fmf")
+            memory=$(grep -rPo '    m: \K(.*)' "$provision_fmf" || :)
           fi
           if [ -z "$memory" ]; then
             memory=2048

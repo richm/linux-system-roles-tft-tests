@@ -10,6 +10,16 @@ permissions:
   # This is required for the ability to create/update the Pull request status
   statuses: write
 jobs:
+  test_this:
+    name: Test using workflow_dispatch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump github context
+        run:   echo "$GITHUB_CONTEXT"
+        shell: bash
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+
   prepare_run_vars:
     name: Get head sha of the tft-tests PR
     concurrency:

@@ -4,6 +4,7 @@ on:
   issue_comment:
     types:
       - created
+  workflow_dispatch:
 permissions:
   contents: read
   # This is required for the ability to create/update the Pull request status
@@ -18,10 +19,11 @@ jobs:
     # Let's schedule tests only on user request. NOT automatically.
     # Only repository owner or member can schedule tests
     if: |
-      github.event.issue.pull_request
+      (github.event.issue.pull_request
       && contains(github.event.comment.body, '[get_python_modules]')
       && (contains(fromJson('["OWNER", "MEMBER", "COLLABORATOR", "CONTRIBUTOR"]'), github.event.comment.author_association)
-      || contains('systemroller', github.event.comment.user.login))
+      || contains('systemroller', github.event.comment.user.login)))
+      || github.event.workflow_dispatch
     runs-on: ubuntu-latest
     outputs:
       head_sha: ${{ steps.head_sha.outputs.head_sha }}

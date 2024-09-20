@@ -319,7 +319,7 @@ rolesRunPlaybook() {
     local inventory=$3
     local skip_tags=$4
     local limit=$5
-    local LOGFILE="${test_playbook%.*}"-ANSIBLE-"$ANSIBLE_VER"
+    local LOGFILE="$REPO_NAME-${test_playbook%.*}"-ANSIBLE-"$ANSIBLE_VER"
     local result=FAIL
     local base_cmd cmd envs log_msg
     envs=""
@@ -340,7 +340,7 @@ rolesRunPlaybook() {
     LOGFILE=$logfile_name
     rolesUploadLogs "$LOGFILE"
     if [ "${GET_PYTHON_MODULES:-}" = true ]; then
-        cmd="ansible-playbook -i $inventory $skip_tags $limit get_python_modules.yml -vv"
+        cmd="ansible-playbook -i $inventory $skip_tags $limit process_python_modules_packages.yml -vv"
         local packages="$LOGFILE.packages"
         $cmd -e packages_file=$packages -e logfile="$LOGFILE"
         rolesUploadLogs "$packages"

@@ -1,5 +1,5 @@
 ---
-- name: Get python modules
+- name: Get python modules from log file and create packages file
   hosts: all
   gather_facts: false
   vars:
